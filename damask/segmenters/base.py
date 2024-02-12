@@ -26,12 +26,12 @@ class SentenceSegmenter(Segmenter):
     A segmenter that segments a damask text into sentences.
     """
 
-    # Compile the regular expression once
-    sentence_endings_pattern = re.compile(r"(?<=\S)[.!?](?=\s|$)")
+    # Modify the regular expression to include line breaks
+    sentence_endings_pattern = re.compile(r"(?<=\S)[.!?](?=\s|$)|\n")
 
     def segment(self, text: str) -> Generator[Dict[str, Any], None, None]:
         """
-        Segments the given text into sentences based on punctuation marks.
+        Segments the given text into sentences based on punctuation marks and line breaks.
 
         Parameters:
         - text (str): The input text to be segmented into sentences.

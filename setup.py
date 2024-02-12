@@ -8,6 +8,8 @@ setup(
         "nltk",
         "pystache",
         "tabulate",
+        "litellm",
+        "openai",
         # any other dependencies
     ],
     # other metadata

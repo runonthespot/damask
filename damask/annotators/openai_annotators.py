@@ -1,8 +1,11 @@
-from openai import OpenAI
 from .base import Annotator
 from typing import Dict, Any
 import os
 from dotenv import load_dotenv
+
+from litellm import embedding, completion
+from .base import Annotator
+from typing import Dict, Any
 
 load_dotenv()
 
@@ -15,42 +18,29 @@ with the following contents:
 
 
 class EmbeddingAnnotator(Annotator):
-    _api_key = os.getenv("OPENAI_API_KEY")
-    _org = os.getenv("OPENAI_ORG")
-
-    def __init__(self):
-        self.client = OpenAI(
-            api_key=self._api_key,
-            organization=self._org,
-        )
+    def __init__(self, model):
+        self.model = model
 
     def annotate(self, text: str) -> Dict[str, Any]:
-        response = self.client.embeddings.create(
-            input=text, model="text-embedding-ada-002"
-        )
+        response = self.model.embedding.create(input=text)
         embedding = response.data[0].embedding
         return {"embedding": embedding}
 
 
 class ChatCompletionAnnotator(Annotator):
-    _api_key = os.getenv("OPENAI_API_KEY")
-    _org = os.getenv("OPENAI_ORG")
-
-    def __init__(self, system_prompt, user_prompt="{text}"):
-        self.client = OpenAI(
-            api_key=self._api_key,
-            organization=self._org,
-        )
+    def __init__(
+        self, model, system_prompt, user_prompt="{text}", tag="chat_completion"
+    ):
+        self.model = model
         self.system_prompt = system_prompt
         self.user_prompt = user_prompt
+        self.tag = tag
 
     def annotate(self, text) -> Dict[str, Any]:
-        response = self.client.chat.completions.create(
-            model="gpt-4-1106-preview",  # or another model you prefer
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": self.user_prompt.format(text=text)},
-            ],
-        )
-        chat_completion = response.choices[0].message.content
-        return {"chat_completion": chat_completion}
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": self.user_prompt.format(text=text)},
+        ]
+        response = self.model.completion(messages=messages, stream=True)
+        chat_completion = next(response).choices[0].delta.content or ""
+        return {self.tag: chat_completion}
