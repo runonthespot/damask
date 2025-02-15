@@ -1,0 +1,30 @@
+/* Custom CSS for Streamlit app */
+body {
+  font-family: "Arial", sans-serif;
+}
+
+/* Style for the sidebar */
+.sidebar .sidebar-content {
+  background-color: #f1f1f1;
+  padding: 10px;
+}
+
+/* Style for the main content area */
+.main .block-container {
+  padding: 20px;
+  background-color: #fff;
+}
+
+/* Style for the sliders in the sidebar */
+.stSlider > div {
+  background-color: #e8e8e8;
+}
+
+/* Style for the buttons */
+.stButton > button {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+/* Additional custom styles */
+/* ... */
